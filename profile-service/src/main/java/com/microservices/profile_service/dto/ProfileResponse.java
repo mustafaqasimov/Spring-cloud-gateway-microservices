@@ -9,14 +9,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProfileResponse {
-
     Long id;
-
     Long userId;
-
     String name;
-
     String email;
-
     String bio;
 }

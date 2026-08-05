@@ -2,6 +2,7 @@ package com.microservices.profile_service.exception.base;
 
 import com.microservices.profile_service.exception.ResourceAlreadyExistsException;
 import com.microservices.profile_service.exception.ResourceNotFoundException;
+import com.microservices.profile_service.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException ex) {
         log.error("Resource already exists: ", ex);
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException ex) {
+        log.warn("Unauthorized access attempt: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String message) {

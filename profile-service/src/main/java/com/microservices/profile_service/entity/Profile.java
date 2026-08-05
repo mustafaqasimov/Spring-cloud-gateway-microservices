@@ -18,8 +18,14 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class Profile extends BaseEntity {
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false, unique = true)
     Long userId;
+
+    @Column(name = "name", nullable = false, length = 150)
+    String name;
+
+    @Column(name = "email", nullable = false, length = 150)
+    String email;
 
     @Column(name = "bio", length = 500)
     String bio;
