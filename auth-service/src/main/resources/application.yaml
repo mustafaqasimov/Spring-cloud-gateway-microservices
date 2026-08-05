@@ -1,9 +1,9 @@
 spring:
   application:
-    name: Profile-Service
+    name: Auth-Service
 
   profiles:
     active: dev
 
 server:
-  port: 8082
+  port: 8081
