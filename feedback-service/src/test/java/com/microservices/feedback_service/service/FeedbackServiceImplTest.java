@@ -10,6 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -63,36 +67,24 @@ public class FeedbackServiceImplTest {
     }
 
     @Test
-    void getAll_shouldReturnFeedbackList() {
-
+    void getAll_shouldReturnPagedFeedbackList() {
+        Pageable pageable = PageRequest.of(0, 20);
         Feedback feedback1 = new Feedback();
         Feedback feedback2 = new Feedback();
+        FeedbackResponse response1 = new FeedbackResponse();
+        FeedbackResponse response2 = new FeedbackResponse();
 
-        FeedbackResponse response1 =
-                new FeedbackResponse();
+        Page<Feedback> feedbackPage = new PageImpl<>(List.of(feedback1, feedback2), pageable, 2);
 
-        FeedbackResponse response2 =
-                new FeedbackResponse();
+        when(feedbackRepository.findAll(pageable)).thenReturn(feedbackPage);
+        when(feedbackMapper.toResponse(feedback1)).thenReturn(response1);
+        when(feedbackMapper.toResponse(feedback2)).thenReturn(response2);
 
-        when(feedbackRepository.findAll())
-                .thenReturn(List.of(feedback1, feedback2));
+        Page<FeedbackResponse> result = feedbackService.getAll(pageable);
 
-        when(feedbackMapper.toResponse(feedback1))
-                .thenReturn(response1);
-
-        when(feedbackMapper.toResponse(feedback2))
-                .thenReturn(response2);
-
-        List<FeedbackResponse> result =
-                feedbackService.getAll();
-
-        verify(feedbackRepository).findAll();
-
-        verify(feedbackMapper).toResponse(feedback1);
-        verify(feedbackMapper).toResponse(feedback2);
-
-        assertEquals(2, result.size());
-        assertEquals(response1, result.get(0));
-        assertEquals(response2, result.get(1));
+        verify(feedbackRepository).findAll(pageable);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(response1, result.getContent().get(0));
+        assertEquals(response2, result.getContent().get(1));
     }
 }

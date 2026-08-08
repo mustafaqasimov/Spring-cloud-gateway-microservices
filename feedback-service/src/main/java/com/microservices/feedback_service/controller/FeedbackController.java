@@ -7,11 +7,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/feedback")
@@ -32,7 +34,9 @@ public class FeedbackController {
 
     @Operation(summary = "List all feedback entries", description = "Retrieves all feedback entries")
     @GetMapping
-    public List<FeedbackResponse> getAll() {
-        return feedbackService.getAll();
+    public Page<FeedbackResponse> getAll(
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+    ) {
+        return feedbackService.getAll(pageable);
     }
 }
