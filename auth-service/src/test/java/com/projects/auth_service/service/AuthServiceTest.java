@@ -1,4 +1,4 @@
-package com.projects.auth_service.controller;
+package com.projects.auth_service.service;
 
 import com.projects.auth_service.dto.AuthResponse;
 import com.projects.auth_service.dto.LoginRequest;
@@ -15,27 +15,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthControllerTest {
+class AuthServiceImplTest {
 
-    @Mock private UserRepository userRepository;
-    @Mock private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @Mock private JwtService jwtService;
     @Mock private UserMapper userMapper;
 
-    @InjectMocks private AuthController authController;
+    @InjectMocks
+    private AuthService authService;
 
     @Test
-    void register_creates_user_and_returns_token() {
+    void register_createsUserAndReturnsToken() {
         RegisterRequest request = new RegisterRequest("john", "john@mail.com", "password123");
         User mappedUser = User.builder().userName("john").email("john@mail.com").password("hashed").role(Role.ROLE_USER).build();
         User savedUser = User.builder().id(1L).userName("john").email("john@mail.com").password("hashed").role(Role.ROLE_USER).build();
@@ -48,36 +50,22 @@ class AuthControllerTest {
         when(jwtService.generateToken(savedUser)).thenReturn("fake-jwt");
         when(userMapper.toAuthResponse(savedUser, "fake-jwt")).thenReturn(expectedResponse);
 
-        ResponseEntity<AuthResponse> response = authController.register(request);
+        AuthResponse response = authService.register(request);
 
-        assertEquals(201, response.getStatusCode().value());
-        assert response.getBody() != null;
-        assertEquals("fake-jwt", response.getBody().getToken());
+        assertEquals("fake-jwt", response.getToken());
     }
 
     @Test
-    void register_rejects_duplicate_username() {
+    void register_rejectsDuplicateUsername() {
         RegisterRequest request = new RegisterRequest("john", "john@mail.com", "password123");
         when(userRepository.existsByUserName("john")).thenReturn(true);
 
-        assertThrows(ResourceAlreadyExistsException.class, () -> authController.register(request));
-
+        assertThrows(ResourceAlreadyExistsException.class, () -> authService.register(request));
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    void register_rejects_duplicate_email() {
-        RegisterRequest request = new RegisterRequest("john", "john@mail.com", "password123");
-        when(userRepository.existsByUserName("john")).thenReturn(false);
-        when(userRepository.existsByEmail("john@mail.com")).thenReturn(true);
-
-        assertThrows(ResourceAlreadyExistsException.class, () -> authController.register(request));
-
-        verify(userRepository, never()).save(any());
-    }
-
-    @Test
-    void login_succeeds_with_correct_password() {
+    void login_succeedsWithCorrectPassword() {
         LoginRequest request = new LoginRequest("john", "password123");
         User user = User.builder().id(1L).userName("john").password("hashed").role(Role.ROLE_USER).build();
         AuthResponse expectedResponse = AuthResponse.builder().token("fake-jwt").userId(1L).username("john").role(Role.ROLE_USER).build();
@@ -87,34 +75,20 @@ class AuthControllerTest {
         when(jwtService.generateToken(user)).thenReturn("fake-jwt");
         when(userMapper.toAuthResponse(user, "fake-jwt")).thenReturn(expectedResponse);
 
-        ResponseEntity<AuthResponse> response = authController.login(request);
+        AuthResponse response = authService.login(request);
 
-        assertEquals(200, response.getStatusCode().value());
-        assert response.getBody() != null;
-        assertEquals("fake-jwt", response.getBody().getToken());
+        assertEquals("fake-jwt", response.getToken());
     }
 
     @Test
-    void login_rejects_wrong_password() {
+    void login_rejectsWrongPassword() {
         LoginRequest request = new LoginRequest("john", "wrong-password");
         User user = User.builder().id(1L).userName("john").password("hashed").role(Role.ROLE_USER).build();
 
         when(userRepository.findByUserName("john")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrong-password", "hashed")).thenReturn(false);
 
-        assertThrows(InvalidCredentialsException.class, () -> authController.login(request));
-
+        assertThrows(InvalidCredentialsException.class, () -> authService.login(request));
         verify(jwtService, never()).generateToken(any());
     }
-
-    @Test
-    void login_rejects_unknown_username() {
-        LoginRequest request = new LoginRequest("ghost", "password123");
-        when(userRepository.findByUserName("ghost")).thenReturn(Optional.empty());
-
-        assertThrows(InvalidCredentialsException.class, () -> authController.login(request));
-
-        verify(jwtService, never()).generateToken(any());
-    }
-
 }

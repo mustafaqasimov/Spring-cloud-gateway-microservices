@@ -2,10 +2,10 @@ package com.microservices.feedback_service.service;
 
 import com.microservices.feedback_service.dto.FeedbackRequest;
 import com.microservices.feedback_service.dto.FeedbackResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface FeedbackService {
     FeedbackResponse create(Long userId, FeedbackRequest request);
-    List<FeedbackResponse> getAll();
+    Page<FeedbackResponse> getAll(Pageable pageable);
 }

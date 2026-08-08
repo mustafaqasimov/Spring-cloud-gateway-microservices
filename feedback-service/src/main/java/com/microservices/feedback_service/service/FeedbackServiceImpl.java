@@ -6,9 +6,9 @@ import com.microservices.feedback_service.entity.Feedback;
 import com.microservices.feedback_service.mapper.FeedbackMapper;
 import com.microservices.feedback_service.repository.FeedbackRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +26,8 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     @Override
-    public List<FeedbackResponse> getAll() {
-
-        List<Feedback> feedbacks = feedbackRepository.findAll();
-        return feedbacks.stream().map(feedbackMapper::toResponse).toList();
+    public Page<FeedbackResponse> getAll(Pageable pageable) {
+        return feedbackRepository.findAll(pageable)
+                .map(feedbackMapper::toResponse);
     }
 }

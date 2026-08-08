@@ -1,4 +1,4 @@
-package com.microservices.profile_service.controller;
+package com.microservices.profile_service.service;
 
 import com.microservices.profile_service.dto.ProfileRequest;
 import com.microservices.profile_service.dto.ProfileResponse;
@@ -7,7 +7,6 @@ import com.microservices.profile_service.exception.ResourceNotFoundException;
 import com.microservices.profile_service.exception.UnauthorizedException;
 import com.microservices.profile_service.mapper.ProfileMapper;
 import com.microservices.profile_service.repository.ProfileRepository;
-import com.microservices.profile_service.service.ProfileServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -151,5 +150,27 @@ class ProfileServiceImplTest {
 
         verify(profileRepository, never())
                 .delete(any());
+    }
+
+    @Test
+    void getById() {
+        Long id = 1L;
+        Long currentUserId = 10L;
+        Profile profile = new Profile();
+        profile.setId(id);
+        profile.setUserId(currentUserId);
+
+        when(profileRepository.findById(id))
+                .thenReturn(Optional.of(profile));
+
+        ProfileResponse response = new ProfileResponse();
+
+        when(profileMapper.toResponse(profile))
+                .thenReturn(response);
+
+        ProfileResponse result = profileService.getById(id, currentUserId);
+
+        verify(profileRepository).findById(id);
+        assertEquals(response, result);
     }
 }
