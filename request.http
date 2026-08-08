@@ -1,0 +1,87 @@
+### 1. Register
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "test1user",
+  "email": "test1@mail.com",
+  "password": "password123"
+}
+
+### 2. Login
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "test1user",
+  "password": "password123"
+}
+
+> {%
+    client.global.set("token", response.body.token);
+%}
+
+### 3. Create Profile
+POST http://localhost:8080/profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Test User",
+  "email": "test@mail.com",
+  "bio": "Salam, bu mənim bio-mdur"
+}
+
+> {%
+    client.global.set("profileId", response.body.id);
+%}
+
+### 4. Get Profile
+GET http://localhost:8080/profiles/{{profileId}}
+Authorization: Bearer {{token}}
+
+### 5. Update Profile
+PUT http://localhost:8080/profiles/{{profileId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Test User Updated",
+  "email": "test@mail.com",
+  "bio": "Yenilənmiş bio"
+}
+
+### 6. Submit Feedback
+POST http://localhost:8080/feedback
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": "Bu, çox yaxşı bir servisdir!"
+}
+
+### 7. List All Feedback
+GET http://localhost:8080/feedback
+Authorization: Bearer {{token}}
+
+### 8. Delete Profile
+DELETE http://localhost:8080/profiles/{{profileId}}
+Authorization: Bearer {{token}}
+
+### 9. Bypass Test - Gateway-i keçib birbaşa profile-service-ə (403 gözlənilir)
+GET http://localhost:8082/profiles/1
+
+### 10. Auth olmadan qorunan endpoint-ə cəhd (401 gözlənilir)
+GET http://localhost:8080/profiles/1
+
+### 11. Actuator health yoxlamaları
+GET http://localhost:8081/actuator/health
+
+###
+GET http://localhost:8082/actuator/health
+
+###
+GET http://localhost:8083/actuator/health
+
+###
+GET http://localhost:8080/actuator/health

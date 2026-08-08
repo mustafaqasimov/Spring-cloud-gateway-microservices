@@ -9,6 +9,7 @@ import com.projects.auth_service.exception.ResourceAlreadyExistsException;
 import com.projects.auth_service.mapper.UserMapper;
 import com.projects.auth_service.repository.UserRepository;
 import com.projects.auth_service.security.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserMapper userMapper;
 
+    @Operation(summary = "Register a new user", description = "Register a new user with the provided details")
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         if (userRepository.existsByUserName(request.getUsername())) {
@@ -46,6 +48,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toAuthResponse(saved, token));
     }
 
+    @Operation(summary = "Login an existing user", description = "Authenticate an existing user with the provided credentials")
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = userRepository.findByUserName(request.getUsername())

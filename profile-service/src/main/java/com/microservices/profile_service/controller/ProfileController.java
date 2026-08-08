@@ -19,7 +19,7 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    @Operation(summary = "Create your profile")
+    @Operation(summary = "Create your profile", description = "Creates a new user profile")
     @PostMapping
     public ResponseEntity<ProfileResponse> create(
             @RequestHeader("X-User-Id") Long userId,
@@ -28,7 +28,7 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(profileService.create(userId, request));
     }
 
-    @Operation(summary = "Get a profile by id (only the owner)")
+    @Operation(summary = "Get a profile by id (only the owner)", description = "Retrieves a user profile by its ID if the user is the owner")
     @GetMapping("/{id}")
     public ProfileResponse getById(
             @RequestHeader("X-User-Id") Long currentUserId,
@@ -37,7 +37,7 @@ public class ProfileController {
         return profileService.getById(id, currentUserId);
     }
 
-    @Operation(summary = "Update your profile")
+    @Operation(summary = "Update your profile", description = "Updates an existing user profile")
     @PutMapping("/{id}")
     public ProfileResponse update(
             @RequestHeader("X-User-Id") Long currentUserId,
@@ -47,7 +47,7 @@ public class ProfileController {
         return profileService.update(id, currentUserId, request);
     }
 
-    @Operation(summary = "Delete your profile")
+    @Operation(summary = "Delete your profile", description = "Deletes a user profile")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @RequestHeader("X-User-Id") Long currentUserId,
