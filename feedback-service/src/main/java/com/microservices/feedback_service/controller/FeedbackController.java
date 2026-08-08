@@ -21,7 +21,7 @@ public class FeedbackController {
 
     private final FeedbackService feedbackService;
 
-    @Operation(summary = "Submit feedback")
+    @Operation(summary = "Submit feedback", description = "Submits a new feedback entry")
     @PostMapping
     public ResponseEntity<FeedbackResponse> create(
             @RequestHeader("X-User-Id") Long userId,
@@ -30,7 +30,7 @@ public class FeedbackController {
         return ResponseEntity.status(HttpStatus.CREATED).body(feedbackService.create(userId, request));
     }
 
-    @Operation(summary = "List all feedback entries")
+    @Operation(summary = "List all feedback entries", description = "Retrieves all feedback entries")
     @GetMapping
     public List<FeedbackResponse> getAll() {
         return feedbackService.getAll();

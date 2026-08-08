@@ -3,6 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/auth-service/src/main/resources/db/migration/V1__create_app_users_table.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/feedback-service/src/main/resources/db/migration/V1__create_feedback_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/postgres-init/init-databases.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/profile-service/src/main/resources/db/migration/V1__create_profiles_table.sql" dialect="PostgreSQL" />
   </component>
 </project>
